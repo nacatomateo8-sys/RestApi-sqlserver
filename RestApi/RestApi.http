@@ -1,0 +1,25 @@
+@RestApi_HostAddress = http://localhost:5205
+
+### 1) Ver un plato -> 200
+GET {{RestApi_HostAddress}}/platos/1
+
+### 2) Plato inexistente -> 404
+GET {{RestApi_HostAddress}}/platos/999
+
+### 3) Actualizar -> 200
+PUT {{RestApi_HostAddress}}/platos/1
+Content-Type: application/json
+
+{ "nombre": "Ceviche mixto", "descripcion": "Camarón y pescado", "precio": 9.00, "categoriaId": 1 }
+
+### 4) Precio 0 -> 400
+PUT {{RestApi_HostAddress}}/platos/1
+Content-Type: application/json
+
+{ "nombre": "Ceviche mixto", "descripcion": "Camarón y pescado", "precio": 0, "categoriaId": 1 }
+
+### 5) Eliminar -> 204
+DELETE {{RestApi_HostAddress}}/platos/5
+
+### 6) Eliminar de nuevo -> 404
+DELETE {{RestApi_HostAddress}}/platos/5
