@@ -11,7 +11,7 @@ public class PlatoRepositorio(IConfiguration config) : IPlatoRepositorio
             "Falta la cadena de conexión 'Restaurante'. Crea el archivo .env (ver .env.example).");
 
     private const string SelectConCategoria = @"
-        SELECT p.Id, p.Nombre, p.Descripcion, p.Precio, p.CategoriaId, c.Nombre
+        SELECT p.Id, p.Nombre, p.Descripcion, p.Precio, p.CategoriaId, c.Nombre, p.Disponible
         FROM Platos p
         INNER JOIN Categorias c ON c.Id = p.CategoriaId";
 
@@ -20,13 +20,14 @@ public class PlatoRepositorio(IConfiguration config) : IPlatoRepositorio
         await using var cn = new SqlConnection(_cn);
         await cn.OpenAsync();
         await using var cmd = new SqlCommand(
-            @"INSERT INTO Platos (Nombre, Descripcion, Precio, CategoriaId)
+            @"INSERT INTO Platos (Nombre, Descripcion, Precio, CategoriaId, Disponible)
               OUTPUT INSERTED.Id
-              VALUES (@nombre, @desc, @precio, @cat)", cn);
+              VALUES (@nombre, @desc, @precio, @cat, @disponible)", cn);
         cmd.Parameters.AddWithValue("@nombre", p.Nombre);
         cmd.Parameters.AddWithValue("@desc", p.Descripcion);
         cmd.Parameters.AddWithValue("@precio", p.Precio);
         cmd.Parameters.AddWithValue("@cat", p.CategoriaId);
+        cmd.Parameters.AddWithValue("@disponible", p.Disponible);
         return Convert.ToInt32(await cmd.ExecuteScalarAsync());
     }
 
@@ -85,7 +86,8 @@ public class PlatoRepositorio(IConfiguration config) : IPlatoRepositorio
                 Descripcion = dr.IsDBNull(2) ? "" : dr.GetString(2),
                 Precio = dr.GetDecimal(3),
                 CategoriaId = dr.GetInt32(4),
-                Categoria = dr.GetString(5)
+                Categoria = dr.GetString(5),
+                Disponible = dr.GetBoolean(6)
             });
         return lista;
     }

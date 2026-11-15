@@ -1,25 +1,131 @@
-@RestApi_HostAddress = http://localhost:5205
+@host = http://localhost:5205
 
-### 1) Ver un plato -> 200
-GET {{RestApi_HostAddress}}/platos/1
-
-### 2) Plato inexistente -> 404
-GET {{RestApi_HostAddress}}/platos/999
-
-### 3) Actualizar -> 200
-PUT {{RestApi_HostAddress}}/platos/1
+### ====================================================
+### AUTENTICACIÓN (LOGIN ADMINISTRADOR)
+### ====================================================
+# @name loginAdmin
+POST {{host}}/auth/login
 Content-Type: application/json
 
-{ "nombre": "Ceviche mixto", "descripcion": "Camarón y pescado", "precio": 9.00, "categoriaId": 1 }
+{
+  "correo": "admin@itq.ec",
+  "password": "Admin2026*"
+}
 
-### 4) Precio 0 -> 400
-PUT {{RestApi_HostAddress}}/platos/1
+###
+@tokenAdmin = {{loginAdmin.response.body.$.token}}
+
+
+### ====================================================
+### MÓDULO 1: PLATOS
+### ====================================================
+
+### 1) Ver todos los platos -> 200 (Público)
+GET {{host}}/platos
+
+### 2) Ver un plato -> 200 (Público)
+GET {{host}}/platos/1
+
+### 3) Plato inexistente -> 404 (Público)
+GET {{host}}/platos/999
+
+### 4) Crear nuevo plato -> 201 (Requiere Admin)
+POST {{host}}/platos
+Authorization: Bearer {{tokenAdmin}}
 Content-Type: application/json
 
-{ "nombre": "Ceviche mixto", "descripcion": "Camarón y pescado", "precio": 0, "categoriaId": 1 }
+{
+  "nombre": "Seco de chivo",
+  "descripcion": "Chivo guisado con cerveza y naranjilla",
+  "precio": 8.50,
+  "categoriaId": 2
+}
 
-### 5) Eliminar -> 204
-DELETE {{RestApi_HostAddress}}/platos/5
+### 5) Actualizar plato -> 200 (Requiere Admin)
+PUT {{host}}/platos/1
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
 
-### 6) Eliminar de nuevo -> 404
-DELETE {{RestApi_HostAddress}}/platos/5
+{
+  "nombre": "Ceviche mixto",
+  "descripcion": "Camarón y pescado fresco",
+  "precio": 9.00,
+  "categoriaId": 1
+}
+
+### 6) Precio inválido (0) -> 400 (Requiere Admin)
+PUT {{host}}/platos/1
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Ceviche mixto",
+  "descripcion": "Camarón y pescado",
+  "precio": 0,
+  "categoriaId": 1
+}
+
+### 7) Eliminar plato (borrado lógico) -> 204 (Requiere Admin)
+DELETE {{host}}/platos/5
+Authorization: Bearer {{tokenAdmin}}
+
+### 8) Eliminar plato ya inexistente -> 404 (Requiere Admin)
+DELETE {{host}}/platos/999
+Authorization: Bearer {{tokenAdmin}}
+
+
+### ====================================================
+### MÓDULO 2: CATEGORÍAS
+### ====================================================
+
+### 1) Listar categorías -> 200 (Público)
+GET {{host}}/categorias
+
+### 2) Ver categoría por Id -> 200 (Público)
+GET {{host}}/categorias/1
+
+### 3) Ver platos de una categoría -> 200 (Público)
+GET {{host}}/categorias/1/platos
+
+### 4) Crear categoría -> 201 (Requiere Admin)
+POST {{host}}/categorias
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Especialidades del Chef"
+}
+
+
+### ====================================================
+### MÓDULO 3: MESAS Y GENERACIÓN QR
+### ====================================================
+
+### 1) Listar todas las mesas -> 200 (Público)
+GET {{host}}/mesas
+
+### 2) Ver mesa por Id -> 200 (Público)
+GET {{host}}/mesas/1
+
+### 3) Crear mesa -> 201 (Requiere Admin)
+POST {{host}}/mesas
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+ 
+{
+  "numero": 10,
+  "capacidad": 4
+}
+
+### 4) Capacidad inválida -> 400 (Requiere Admin)
+POST {{host}}/mesas
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "numero": 11,
+  "capacidad": 0
+}
+
+### 5) Obtener código QR de la mesa -> 200 (PNG)
+GET {{host}}/mesas/1/qr

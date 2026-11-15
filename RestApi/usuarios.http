@@ -1,0 +1,94 @@
+@host = http://localhost:5205
+
+### 0. Login inicial como Administrador (para obtener token)
+# @name loginAdmin
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{
+  "correo": "admin@itq.ec",
+  "password": "Admin2026*"
+}
+
+###
+@tokenAdmin = {{loginAdmin.response.body.$.token}}
+
+### 1. Registrar Administrador (espera 201)
+POST {{host}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Admin ITQ",
+  "correo": "admin@itq.ec",
+  "password": "Admin2026*",
+  "rol": "Administrador"
+}
+
+### 2. Registrar Mesero (espera 201)
+POST {{host}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Ana Mesera",
+  "correo": "ana@itq.ec",
+  "password": "Mesero2026*",
+  "rol": "Mesero"
+}
+
+### 3. Registrar Cocina (espera 201)
+POST {{host}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Luis Cocina",
+  "correo": "luis@itq.ec",
+  "password": "Cocina2026*",
+  "rol": "Cocina"
+}
+
+### 4. Correo repetido, con mayúsculas y espacios (espera 409)
+POST {{host}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Otra Ana",
+  "correo": "  ANA@itq.ec ",
+  "password": "Mesero2026*",
+  "rol": "Mesero"
+}
+
+### 5. Rol inventado (espera 400)
+POST {{host}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Pedro",
+  "correo": "pedro@itq.ec",
+  "password": "Chef2026*",
+  "rol": "Chef"
+}
+
+### 6. Contraseña corta (espera 400)
+POST {{host}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{
+  "nombre": "Pedro",
+  "correo": "pedro@itq.ec",
+  "password": "123",
+  "rol": "Mesero"
+}
+
+### 7. Listar usuarios (espera 200, sin passwordHash)
+GET {{host}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+
+### 8. Obtener usuario por Id (espera 200)
+GET {{host}}/usuarios/1
+Authorization: Bearer {{tokenAdmin}}

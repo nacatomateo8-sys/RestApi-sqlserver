@@ -1,0 +1,51 @@
+@host = http://localhost:5205
+
+### 1. Login administrador (200)
+# @name loginAdmin
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "correo": "admin@itq.ec", "password": "Admin2026*" }
+
+###
+@tokenAdmin = {{loginAdmin.response.body.$.token}}
+
+### 2. Login mesero (200)
+# @name loginMesero
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "correo": "ana@itq.ec", "password": "Mesero2026*" }
+
+###
+@tokenMesero = {{loginMesero.response.body.$.token}}
+
+### 3. Contraseña incorrecta (401)
+POST {{host}}/auth/login
+Content-Type: application/json
+
+{ "correo": "admin@itq.ec", "password": "incorrecta" }
+
+### 4. /auth/yo con token de admin (200)
+GET {{host}}/auth/yo
+Authorization: Bearer {{tokenAdmin}}
+
+### 5. Registro sin token (401)
+POST {{host}}/auth/registro
+Content-Type: application/json
+
+{ "nombre": "Luis Cocina", "correo": "luis@itq.ec", "password": "Cocina2026*", "rol": "Cocina" }
+
+### 6. Registro con token de mesero (403)
+POST {{host}}/auth/registro
+Authorization: Bearer {{tokenMesero}}
+Content-Type: application/json
+
+{ "nombre": "Luis Cocina", "correo": "luis@itq.ec", "password": "Cocina2026*", "rol": "Cocina" }
+
+### 7. Registro con token de administrador (201)
+POST {{host}}/auth/registro
+Authorization: Bearer {{tokenAdmin}}
+Content-Type: application/json
+
+{ "nombre": "Luis Cocina", "correo": "luis@itq.ec", "password": "Cocina2026*", "rol": "Cocina" }

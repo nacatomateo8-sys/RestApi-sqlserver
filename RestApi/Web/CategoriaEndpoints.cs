@@ -1,31 +1,34 @@
-﻿using RestApi.Entidades;
+﻿namespace RestApi.Endpoints;
+
+using RestApi.Entidades;
 using RestApi.Negocio;
-using RestApi.Servicios;
+using RestApi.Web;
 
-namespace RestApi.Web;
-
-    public static class CategoriaEndpoints
+public static class CategoriaEndpoints
+{
+    public static void MapCategoriaEndpoints(this IEndpointRouteBuilder app)
     {
-        public static void MapCategoriaEndpoints(this WebApplication app)
-        {
-            var grupo = app.MapGroup("/categorias");   // todas empiezan con /categorias
+        var grupo = app.MapGroup("/categorias");
 
-            grupo.MapGet("/", async (CategoriaServicio s) =>
-                Results.Ok(await s.ObtenerTodasAsync()));
+        // Lectura pública
+        grupo.MapGet("/", async (CategoriaServicio s) =>
+            Results.Ok(await s.ObtenerTodasAsync()));
 
-            grupo.MapGet("/{id:int}", (int id, CategoriaServicio s) =>
-                Respuestas.Manejar(async () => Results.Ok(await s.ObtenerPorIdAsync(id))));
+        grupo.MapGet("/{id:int}", (int id, CategoriaServicio s) =>
+            Respuestas.Manejar(async () => Results.Ok(await s.ObtenerPorIdAsync(id))));
 
-        // La relación: todos los platos de una categoría
+        // Todos los platos de una categoría
         grupo.MapGet("/{id:int}/platos", (int id, PlatoServicio s) =>
-        Respuestas.Manejar(async () => Results.Ok(await s.ObtenerPorCategoriaAsync(id))));
+            Respuestas.Manejar(async () => Results.Ok(await s.ObtenerPorCategoriaAsync(id))));
 
+        // Modificaciones protegidas: Solo Administrador
         grupo.MapPost("/", (Categoria c, CategoriaServicio s) =>
-             Respuestas.Manejar(async () =>
-             {
-                 c.Id = await s.AgregarAsync(c);
-                 return Results.Created($"/categorias/{c.Id}", c);
-             }));
+            Respuestas.Manejar(async () =>
+            {
+                c.Id = await s.AgregarAsync(c);
+                return Results.Created($"/categorias/{c.Id}", c);
+            }))
+            .RequireAuthorization("SoloAdmin");
 
         grupo.MapPut("/{id:int}", (int id, Categoria c, CategoriaServicio s) =>
             Respuestas.Manejar(async () =>
@@ -33,13 +36,15 @@ namespace RestApi.Web;
                 c.Id = id;
                 await s.ActualizarAsync(c);
                 return Results.Ok(c);
-            }));
+            }))
+            .RequireAuthorization("SoloAdmin");
 
         grupo.MapDelete("/{id:int}", (int id, CategoriaServicio s) =>
             Respuestas.Manejar(async () =>
             {
                 await s.EliminarAsync(id);
                 return Results.NoContent();
-            }));
+            }))
+            .RequireAuthorization("SoloAdmin");
     }
 }
