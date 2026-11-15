@@ -11,8 +11,11 @@ public static class ServiciosRestaurante
         services.AddScoped<IPlatoRepositorio, PlatoRepositorio>();
         services.AddScoped<PlatoServicio>();
 
-        services.AddScoped<CategoriaRepositorio>();
+        services.AddScoped<ICategoriaRepositorio, CategoriaRepositorio>();
         services.AddScoped<CategoriaServicio>();
+
+        services.AddScoped<IMesaRepositorio, MesaRepositorio>();
+        services.AddScoped<MesaServicio>();
 
         services.AddScoped<ProductoRepositorio>();
         services.AddScoped<ProductoServicio>();

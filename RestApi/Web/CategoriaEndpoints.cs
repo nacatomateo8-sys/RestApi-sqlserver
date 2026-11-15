@@ -1,13 +1,14 @@
 ﻿using RestApi.Entidades;
 using RestApi.Negocio;
-using RestApi.Servicios;
+using RestApi.Web;
 
-namespace RestApi.Web;
+// Corrección: Namespace unificado a RestApi.Endpoints para coincidir con Program.cs y PlatoEndpoints
+namespace RestApi.Endpoints;
 
-    public static class CategoriaEndpoints
+public static class CategoriaEndpoints
+{
+    public static void MapCategoriaEndpoints(this WebApplication app)
     {
-        public static void MapCategoriaEndpoints(this WebApplication app)
-        {
             var grupo = app.MapGroup("/categorias");   // todas empiezan con /categorias
 
             grupo.MapGet("/", async (CategoriaServicio s) =>

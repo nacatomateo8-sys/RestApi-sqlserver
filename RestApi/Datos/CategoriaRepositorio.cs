@@ -1,10 +1,12 @@
 namespace RestApi.Datos;
 
 using Microsoft.Data.SqlClient;
+using RestApi.Datos.Interfaces;
 using RestApi.Entidades;
 
-    public class CategoriaRepositorio(IConfiguration config)
-    {
+// Corrección: Implementa ICategoriaRepositorio para permitir inyección por interfaz en la capa de negocio
+public class CategoriaRepositorio(IConfiguration config) : ICategoriaRepositorio
+{
     private readonly string _cn = config.GetConnectionString("Restaurante")!;
 
     public async Task<List<Categoria>> ObtenerTodasAsync()

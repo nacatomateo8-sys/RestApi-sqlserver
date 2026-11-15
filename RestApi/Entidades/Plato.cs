@@ -10,5 +10,6 @@
         public int CategoriaId { get; set; }
 
         public string Categoria { get; set; } = "";
+        public int Disponible { get; internal set; }
     }
 }

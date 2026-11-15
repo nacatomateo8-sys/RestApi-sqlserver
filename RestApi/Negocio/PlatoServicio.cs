@@ -4,7 +4,8 @@ using RestApi.Datos;
 using RestApi.Datos.Interfaces;
 using RestApi.Entidades;
 
-public class PlatoServicio(IPlatoRepositorio repo, CategoriaRepositorio categorias)
+// Corrección: Inyección mediante interfaces (IPlatoRepositorio e ICategoriaRepositorio) según directrices de AGENTS.md
+public class PlatoServicio(IPlatoRepositorio repo, ICategoriaRepositorio categorias)
 {
     public Task<List<Plato>> ObtenerTodosAsync() => repo.ObtenerTodosAsync();
 

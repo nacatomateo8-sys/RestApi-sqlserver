@@ -1,10 +1,11 @@
 ﻿namespace RestApi.Negocio;
 
-using RestApi.Datos;
+using RestApi.Datos.Interfaces;
 using RestApi.Entidades;
 
-    public class CategoriaServicio(CategoriaRepositorio repo)
-    {
+// Corrección: Inyección mediante la interfaz ICategoriaRepositorio para respetar desacoplamiento de capas
+public class CategoriaServicio(ICategoriaRepositorio repo)
+{
     public Task<List<Categoria>> ObtenerTodasAsync() => repo.ObtenerTodasAsync();
 
     public async Task<Categoria> ObtenerPorIdAsync(int id)
