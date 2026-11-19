@@ -50,4 +50,8 @@ INSERT INTO Platos (Nombre, Descripcion, Precio, CategoriaId) VALUES
 
 INSERT INTO Mesas (Numero, Capacidad) VALUES
  (1, 4), (2, 2), (3, 6), (4, 4);
+
+-- Usuario inicial administrador para pruebas (admin@itq.ec / Admin2026*)
+INSERT INTO Usuarios (Nombre, Correo, PasswordHash, Rol, Activo) VALUES
+ (N'Admin ITQ', N'admin@itq.ec', N'$2a$11$Qe7ye3/2aYqzqNj1tgYbweWvB7ZtZ9CCgCT2FlGZ89867Dglfyvyu', N'Administrador', 1);
 GO

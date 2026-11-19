@@ -1,4 +1,4 @@
-﻿namespace RestApi.Endpoints;
+namespace RestApi.Endpoints;
 
 using QRCoder;
 using RestApi.Entidades;
@@ -50,7 +50,8 @@ public static class MesaEndpoints
             Respuestas.Manejar(async () =>
             {
                 var mesa = await s.ObtenerAsync(id);
-                var url = $"{cfg["App:UrlMenu"]}?mesa={mesa.Numero}";
+                var baseUrl = cfg["App:UrlMenu"] ?? "http://localhost:5205/menu";
+                var url = $"{baseUrl}?mesa={mesa.Numero}";
 
                 using var gen = new QRCodeGenerator();
                 using var datos = gen.CreateQrCode(url, QRCodeGenerator.ECCLevel.Q);

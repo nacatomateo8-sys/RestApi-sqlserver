@@ -4,7 +4,7 @@ using Microsoft.Data.SqlClient;
 using RestApi.Datos.Interfaces;
 using RestApi.Entidades;
 
-// Corrección: Implementa ICategoriaRepositorio para permitir inyección por interfaz en la capa de negocio
+// Implementa ICategoriaRepositorio para permitir inyección por interfaz en la capa de negocio
 public class CategoriaRepositorio(IConfiguration config) : ICategoriaRepositorio
 {
     private readonly string _cn = config.GetConnectionString("Restaurante")
@@ -23,6 +23,7 @@ public class CategoriaRepositorio(IConfiguration config) : ICategoriaRepositorio
             lista.Add(new Categoria { Id = dr.GetInt32(0), Nombre = dr.GetString(1) });
         return lista;
     }
+
     public async Task<Categoria?> ObtenerPorIdAsync(int id)
     {
         await using var cn = new SqlConnection(_cn);
@@ -63,8 +64,16 @@ public class CategoriaRepositorio(IConfiguration config) : ICategoriaRepositorio
         await using var cmd = new SqlCommand(
             "DELETE FROM Categorias WHERE Id = @id", cn);
         cmd.Parameters.AddWithValue("@id", id);
-        return await cmd.ExecuteNonQueryAsync();
+        try
+        {
+            return await cmd.ExecuteNonQueryAsync();
+        }
+        catch (SqlException ex) when (ex.Number == 547)
+        {
+            throw new InvalidOperationException($"La categoría {id} tiene registros asociados y no puede ser eliminada.");
+        }
     }
+
     public async Task<int> ContarPlatosAsync(int id)
     {
         await using var cn = new SqlConnection(_cn);
@@ -75,4 +84,3 @@ public class CategoriaRepositorio(IConfiguration config) : ICategoriaRepositorio
         return Convert.ToInt32(await cmd.ExecuteScalarAsync());
     }
 }
-

@@ -1,1 +1,1 @@
-﻿// Archivo movido a RestApi/Extensiones/ServiciosRestaurante.cs
+// Archivo movido a RestApi/Extensiones/ServiciosRestaurante.cs
